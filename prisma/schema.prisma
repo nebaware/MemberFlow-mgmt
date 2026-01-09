@@ -1,0 +1,377 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Authentication Models ----------
+
+enum Role {
+  FARMER
+  BUYER
+  TRANSPORTER
+  STORAGE_PROVIDER
+  EDUCATOR
+  ADMIN
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String?
+  passwordHash      String?  @map("password_hash")
+  role              Role     @default(FARMER)
+  phone             String?
+  location          String?
+  licenseNumber     String?  @map("license_number")
+  licenseExpiry     DateTime? @map("license_expiry")
+  licenseVerified   Boolean  @default(false) @map("license_verified")
+  licenseVerificationDate DateTime? @map("license_verification_date")
+  verifiedByAdminId String?  @map("verified_by_admin_id")
+  verificationStatus String  @default("pending") @map("verification_status")
+  farmSize          Float?
+  farmSizeUnit      String?
+  specialization    String?
+  bio               String?
+  experienceYears   Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  profileImage      String?  @map("profile_image")
+  walletBalance     Float    @default(0) @map("wallet_balance")
+  escrowBalance     Float    @default(0) @map("escrow_balance")
+  verified          Boolean  @default(false)
+  lastLogin         DateTime? @map("last_login")
+  twoFactorSecret   String?
+  twoFactorEnabled  Boolean  @default(false)
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  verifiedBy        User?    @relation("VerifiedBy", fields: [verifiedByAdminId], references: [id], onDelete: SetNull)
+  verifiedUsers     User[]   @relation("VerifiedBy")
+  products          Product[]
+  orders            Order[]  @relation("BuyerOrders")
+  sales             Order[]  @relation("SellerOrders")
+  roleChangeRequests RoleChangeRequest[]
+  notifications     Notification[]
+  wallet            Wallet?
+  devices           IoTDevice[] @relation("FarmerDevices")
+  
+  // Learning & Consultations
+  learningContent   LearningContent[]
+  consultationsAsEducator Consultation[] @relation("EducatorConsultations")
+  consultationsAsRequester Consultation[] @relation("RequesterConsultations")
+  transportationJobs Transportation[] @relation("TransporterJobs")
+  storageFacilities StorageFacility[]
+  storageBookings   StorageBooking[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Float
+  category    String
+  imageUrl    String?  @map("image_url")
+  imagePreview String? @map("image_preview")
+  farmerId    String?  @map("farmer_id")
+  farmerName  String?  @map("farmer_name")
+  stockQuantity Float?  @map("stock_quantity")
+  unit        String?  @default("kg")
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  orderNumber String   @unique @map("order_number") @default(cuid())
+  buyerId     String
+  buyer       User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId    String
+  seller      User     @relation("SellerOrders", fields: [sellerId], references: [id])
+  totalAmount Float    @map("total_amount")
+  platformFee Float    @default(0) @map("platform_fee")
+  deliveryFee Float    @default(0) @map("delivery_fee")
+  netAmount   Float    @default(0) @map("net_amount")
+  status      String   @default("pending") // pending, processing, shipped, delivered, cancelled
+  paymentStatus String @default("pending") @map("payment_status") // pending, paid, in_escrow, released, disputed
+  paymentMethod String? @map("payment_method")
+  deliveryAddress String? @map("delivery_address")
+  deliveryType String?   @default("delivery") @map("delivery_type")
+  deliveryStatus String @default("pending") // pending, shipped, delivered, disputed
+  escrowStatus String  @default("held")    // held, released, disputed
+  shippingAddress String? // JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       OrderItem[]
+  escrowTransaction EscrowTransaction?
+  dispute     Dispute?
+  transportation Transportation[]
+}
+
+model EscrowTransaction {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  order       Order    @relation(fields: [orderId], references: [id])
+  amount      Float
+  status      String   // held, released, refunded
+  releasedAt  DateTime?
+  refundedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  user               User    @relation(fields: [userId], references: [id])
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model RoleChangeRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  requestedRole Role
+  status        String   @default("pending") // pending, approved, rejected
+  documents     String?  // JSON string of document URLs
+  adminNotes    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // order_paid, order_shipped, order_delivered, dispute_created, etc.
+  title     String
+  message   String
+  orderId   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Dispute {
+  id         String    @id @default(cuid())
+  orderId    String    @unique
+  order      Order     @relation(fields: [orderId], references: [id])
+  raisedBy   String    // userId who raised the dispute
+  reason     String
+  status     String    @default("pending") // pending, resolved, rejected
+  resolution String?   // Description of how it was resolved
+  resolvedBy String?   // Admin userId who resolved it
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+}
+
+model Wallet {
+  id                    String              @id @default(cuid())
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id])
+  balance               Float               @default(0)
+  pendingBalance        Float               @default(0)
+  totalEarnings         Float               @default(0)
+  updatedAt             DateTime            @updatedAt
+  transactions          WalletTransaction[]
+  
+  // Withdrawal limits
+  dailyWithdrawalLimit  Float               @default(10000)  // 10,000 Birr default
+  monthlyWithdrawalLimit Float              @default(50000)  // 50,000 Birr default
+  dailyWithdrawn        Float               @default(0)
+  monthlyWithdrawn      Float               @default(0)
+  lastWithdrawalDate    DateTime?
+  lastMonthReset        DateTime            @default(now())
+}
+
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  type        String   // credit, debit, withdrawal, refund
+  amount      Float
+  orderId     String?
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?  // User who performed the action (null for system actions)
+  action     String   // Action performed (e.g., "order_created", "dispute_resolved", "withdrawal_processed")
+  entityType String   // Type of entity affected (e.g., "Order", "Dispute", "Wallet")
+  entityId   String   // ID of the affected entity
+  changes    String?  // JSON string of what changed
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+}
+
+// ---------- IoT Models ----------
+
+model IoTDevice {
+  id           String   @id @default(cuid())
+  name         String
+  type         String   // enum DeviceType
+  status       String   @default("offline") // enum DeviceStatus
+  farmerId     String
+  farmer       User     @relation("FarmerDevices", fields: [farmerId], references: [id])
+  location     String?  // JSON string { latitude, longitude, address }
+  lastSeen     DateTime @default(now())
+  batteryLevel Int?
+  metadata     String?  // JSON string
+  iconName     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  readings     IoTReading[]
+}
+
+model IoTReading {
+  id        String    @id @default(cuid())
+  deviceId  String
+  device    IoTDevice @relation(fields: [deviceId], references: [id])
+  timestamp DateTime  @default(now())
+  data      String    // JSON string
+  unit      String?
+}
+
+model LearningContent {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   // Article, Video, Quiz
+  content     String   // Content body or URL
+  status      String   @default("draft") // draft, published, pending_review
+  educatorId  String
+  educator    User     @relation(fields: [educatorId], references: [id])
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Consultation {
+  id            String   @id @default(cuid())
+  educatorId    String
+  educator      User     @relation("EducatorConsultations", fields: [educatorId], references: [id])
+  requesterId   String
+  requester     User     @relation("RequesterConsultations", fields: [requesterId], references: [id])
+  topic         String
+  details       String
+  requestedDate DateTime
+  status        String   @default("pending") // pending, accepted, declined, completed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Transportation {
+  id              String    @id @default(cuid())
+  orderId         String?
+  order           Order?    @relation(fields: [orderId], references: [id])
+  transporterId   String?
+  transporter     User?     @relation("TransporterJobs", fields: [transporterId], references: [id])
+  pickupLocation  String
+  dropoffLocation String
+  productName     String
+  deliveryFee     Float
+  status          String    @default("pending") // pending, accepted, in_transit, delivered, cancelled
+  scheduledDate   DateTime?
+  pickupDate      DateTime?
+  deliveryDate    DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model StorageFacility {
+  id                String    @id @default(cuid())
+  providerId        String
+  provider          User      @relation(fields: [providerId], references: [id])
+  name              String
+  location          String
+  type              String
+  capacity          Float
+  capacityUnit      String
+  availableCapacity Float
+  pricePerUnit      Float
+  features          String?   // JSON string
+  availability      String    @default("Available")
+  images            String?   // JSON string
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  bookings          StorageBooking[]
+}
+
+model StorageBooking {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  facilityId     String
+  facility       StorageFacility @relation(fields: [facilityId], references: [id])
+  quantity       Float
+  durationMonths Int
+  totalCost      Float
+  paymentMethod  String
+  paymentStatus  String    @default("Pending")
+  bookingStatus  String    @default("Pending")
+  startDate      DateTime  @default(now())
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model UserLearningProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  moduleId    String
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  enrolledAt  DateTime @default(now())
+  completedAt DateTime?
+  @@unique([userId, moduleId])
+}
+
