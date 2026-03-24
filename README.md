@@ -53,7 +53,9 @@ A high-end, full-stack membership management system tailored for the Ethiopian m
 
 | Login & Security | Administrative Hub | Payment & OCR |
 |------------------|-------------------|---------------|
-| ![Login](https://via.placeholder.com/400x300?text=Login+Portal) | ![Dashboard](https://via.placeholder.com/400x300?text=Admin+Stats) | ![OCR](https://via.placeholder.com/400x300?text=OCR+Verification) |
+| ![Login](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_login_screen_1774353537072.png) | ![Dashboard](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_admin_dashboard_v2_1774354273500.png) | ![OCR](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_ocr_verification_1774354205341.png) |
+
+
 
 ---
 Developed by **Nebaware** | Empowering Ethiopian Organizations.
