@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "nebiyutsegaye213@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidMember(data) {
+      return data.keys().hasAll(['uid', 'fullName', 'email', 'phoneNumber', 'status', 'createdAt', 'otpVerified']) &&
+             data.fullName is string && data.fullName.size() > 0 && data.fullName.size() < 100 &&
+             data.email is string && data.email.matches('^.+@.+\\..+$') &&
+             data.phoneNumber is string && data.phoneNumber.size() > 0 && data.phoneNumber.size() < 20 &&
+             data.status in ['pending', 'active', 'suspended'] &&
+             data.uid == request.auth.uid;
+    }
+
+    function isValidPayment(data) {
+      return data.keys().hasAll(['memberId', 'amount', 'currency', 'method', 'status', 'createdAt']) &&
+             data.memberId == request.auth.uid &&
+             data.amount is number && data.amount > 0 &&
+             data.currency == 'ETB' &&
+             data.method in ['telebirr', 'manual'] &&
+             data.status == 'pending';
+    }
+
+    match /members/{memberId} {
+      allow read: if isAuthenticated() && (isOwner(memberId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(memberId) && isValidMember(request.resource.data);
+      allow update: if isAuthenticated() && (isOwner(memberId) || isAdmin()) && isValidMember(request.resource.data);
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.memberId || isAdmin());
+      allow create: if isAuthenticated() && isValidPayment(request.resource.data);
+      allow update: if isAdmin() && 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'confirmedBy']) &&
+                    request.resource.data.status == 'completed';
+    }
+
+    match /config/org {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId) && request.resource.data.role == 'user';
+      allow update: if isAuthenticated() && isOwner(userId) && 
+                    !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin();
+    }
+  }
+}

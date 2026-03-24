@@ -1,0 +1,5 @@
+{
+  "name": "MemberFlow Pro",
+  "description": "Advanced Organization Membership Management System with Fayda ID integration, Telebirr payments, and custom member attributes.",
+  "requestFramePermissions": ["camera", "microphone"]
+}
