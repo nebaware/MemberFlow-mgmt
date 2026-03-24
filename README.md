@@ -53,7 +53,8 @@ A high-end, full-stack membership management system tailored for the Ethiopian m
 
 | Login & Security | Administrative Hub | Payment & OCR |
 |------------------|-------------------|---------------|
-| ![Login](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_login_screen_1774353537072.png) | ![Dashboard](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_admin_dashboard_v2_1774354273500.png) | ![OCR](/C:/Users/Administrator/.gemini/antigravity/brain/6b69acf8-b32f-40c1-b623-41f46826a24a/memberflow_ocr_verification_1774354205341.png) |
+| ![Login](docs/assets/login_view.png) | ![Dashboard](docs/assets/admin_hub.png) | ![OCR](docs/assets/ocr_verify.png) |
+
 
 
 
