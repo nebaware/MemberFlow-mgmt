@@ -17,6 +17,17 @@ app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+app.get('/', (_req, res) => {
+  res.send(`
+    <div style="font-family: sans-serif; padding: 40px; text-align: center;">
+      <h1 style="color: #0e6b4d;">MemberFlow API</h1>
+      <p>The MemberFlow-Pro backend is live and operational.</p>
+      <a href="/api/health" style="color: #0e6b4d; text-decoration: none; font-weight: bold;">Check System Health →</a>
+    </div>
+  `);
+});
+
+
 // Multer for file uploads (OCR screenshots)
 const upload = multer({
   storage: multer.memoryStorage(),
