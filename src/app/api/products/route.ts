@@ -5,6 +5,13 @@ export async function GET(request: Request) {
   try {
     if (!isDbConfigured()) return NextResponse.json({ error: 'DATABASE not configured' }, { status: 500 });
 
+    // Ensure legacy databases have the required seller_id column
+    try {
+      await dbQuery('ALTER TABLE products ADD COLUMN IF NOT EXISTS seller_id INTEGER REFERENCES users(id);', []);
+    } catch (e) {
+      // Ignore if the column already exists or cannot be added at runtime
+    }
+
     const { searchParams } = new URL(request.url);
     const sellerId = searchParams.get('sellerId') || searchParams.get('farmerId');
     const category = searchParams.get('category');
@@ -61,6 +68,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     if (!isDbConfigured()) return NextResponse.json({ error: 'DATABASE not configured' }, { status: 500 });
+
+    // Ensure legacy databases have the required seller_id column before insert as well
+    try {
+      await dbQuery('ALTER TABLE products ADD COLUMN IF NOT EXISTS seller_id INTEGER REFERENCES users(id);', []);
+    } catch (e) {
+      // Ignore if the column already exists or cannot be added at runtime
+    }
+
     const body = await request.json();
     const { title, name, description, price, category, location, image_url, imageUrl, farmerId, stockQuantity, unit } = body;
 

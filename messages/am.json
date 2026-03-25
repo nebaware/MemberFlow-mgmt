@@ -386,6 +386,7 @@
     "solution_label": "የተጠቆመ መፍትሄ",
     "diagnosis_complete": "ምርመራ ተጠናቋል",
     "diagnosis_complete_desc": "AI የሰብል ምስልዎን ተንትኗል",
+    "safe_mode_active": "ደህንነቱ የተጠበቀ ሁነታ ገቢር ነው።",
     "upload_instruction": "ምስል ይስቀሉ እና ውጤቶችን ለማየት "
   },
   "cooperative": {

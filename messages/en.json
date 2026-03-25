@@ -408,6 +408,7 @@
     "solution_label": "Recommended Solution",
     "diagnosis_complete": "Diagnosis Complete",
     "diagnosis_complete_desc": "AI has analyzed your crop image",
+    "safe_mode_active": "Safe Mode Active",
     "upload_instruction": "Upload a clear photo of your crop to identify pests or diseases instantly"
   },
   "cooperative": {

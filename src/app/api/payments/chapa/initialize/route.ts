@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth.config';
-import { prisma } from '@/lib/db/prisma';
+import { dbQuery } from '@/lib/db/db';
 
 export async function POST(request: Request) {
     try {
@@ -17,27 +17,25 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
         }
 
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
-            include: {
-                buyer: true,
-                items: {
-                    include: {
-                        product: true,
-                    },
-                },
-            },
-        });
+        const orderRows = await dbQuery(
+            `SELECT o.id, o.buyer_id, o.total_amount, o.status, o.payment_status, o.order_number, u.email, u.name as buyer_name
+             FROM orders o
+             JOIN users u ON o.buyer_id = u.id
+             WHERE o.id = $1`,
+            [parseInt(orderId, 10)]
+        );
 
-        if (!order) {
+        if (orderRows.length === 0) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        if (order.buyerId !== session.user.id) {
+        const order = orderRows[0];
+
+        if (order.buyer_id.toString() !== session.user.id) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        if (order.paymentStatus !== 'pending') {
+        if (order.payment_status !== 'pending') {
             return NextResponse.json({ error: 'Order already paid' }, { status: 400 });
         }
 
@@ -49,17 +47,17 @@ export async function POST(request: Request) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                amount: order.totalAmount,
+                amount: order.total_amount,
                 currency: 'ETB',
-                email: order.buyer.email,
-                first_name: order.buyer.name?.split(' ')[0] || 'Customer',
-                last_name: order.buyer.name?.split(' ').slice(1).join(' ') || '',
-                tx_ref: `ORDER-${order.orderNumber}-${Date.now()}`,
-                callback_url: `${process.env.NEXTAUTH_URL}/api/payments/chapa/callback`,
-                return_url: `${process.env.NEXTAUTH_URL}/orders/${order.id}`,
+                email: order.email || 'customer@azmera.com',
+                first_name: order.buyer_name?.split(' ')[0] || 'Customer',
+                last_name: order.buyer_name?.split(' ').slice(1).join(' ') || '',
+                tx_ref: `ORDER-${order.order_number}-${Date.now()}`,
+                callback_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/payments/chapa/callback`,
+                return_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/orders/${order.id}`,
                 customization: {
                     title: 'Azmera Order Payment',
-                    description: `Payment for order #${order.orderNumber}`,
+                    description: `Payment for order #${order.order_number}`,
                 },
                 meta: {
                     orderId: order.id,
@@ -78,15 +76,6 @@ export async function POST(request: Request) {
         }
 
         const chapaData = await chapaResponse.json();
-
-        // Store transaction reference in order
-        await prisma.order.update({
-            where: { id: orderId },
-            data: {
-                // Store tx_ref in a custom field or use existing field
-                orderNumber: order.orderNumber, // Keep original
-            },
-        });
 
         return NextResponse.json({
             success: true,

@@ -64,6 +64,13 @@ export async function POST() {
       }
     }
 
+    // Ensure products table has seller_id column for relational integrity
+    try {
+      await dbQuery('ALTER TABLE products ADD COLUMN IF NOT EXISTS seller_id INTEGER REFERENCES users(id);', []);
+    } catch (e) {
+      // Ignore if migration already applied or not permitted in this environment
+    }
+
     // Create sample products
     const products = [
       { name: 'Teff Grain (White)', description: 'Premium quality white Teff grain from the Gojjam highlands, ideal for Injera.', price: 2500.00, category: 'Grains', location: 'Debre Markos, Amhara Region', farmerId: createdUsers[1].id, farmerName: 'Abebe Kebede', stockQuantity: 500, unit: 'kg' },

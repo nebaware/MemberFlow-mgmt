@@ -465,6 +465,7 @@
     "solution_label": "ዝተመከረ መፍትሒ",
     "diagnosis_complete": "መርመራ ተዛዚሙ",
     "diagnosis_complete_desc": "AI ስእሊ ሰብልኻ ተንቲኑ",
+    "safe_mode_active": "Safe Mode Active",
     "upload_instruction": "ንቅልጡፍ መለለዪ ተባዕትን ሕማማትን ንጹር ስእሊ ሰብልኻ ኣስዕብ",
     "response_language": "Response language"
   },

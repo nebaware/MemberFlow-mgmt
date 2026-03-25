@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "dev": "set NODE_ENV=development && next dev -p 9003",
     "seed": "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-seed-and-verify.ps1 -DbName 'azmera_db' -DbUser 'postgres'",
     "seed:node": "node ./scripts/seed-cli.js",
     "seed:dev": "node ./scripts/seed-cli.js --db-user azmera_user --db-pass azmera_secure_2025 --db-name azmera_db",
@@ -11,7 +11,7 @@
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -89,3 +89,4 @@
     "typescript": "^5"
   }
 }
+

@@ -73,13 +73,21 @@ export async function invokeAI<T>(
                 return { success: true, data: output };
 
             } catch (err: any) {
-                lastError = err;
                 const msg = String(err?.message || err).toLowerCase();
+                lastError = err;
                 const isRateLimited = msg.includes('429') || msg.includes('too many requests') || msg.includes('quota exceeded');
 
                 if (isRateLimited) {
                     logger.warn(`Model ${model || 'Primary'} rate limited. Trying next tier...`);
                     continue; // Try next model in inner loop
+                }
+
+                if (msg.includes('location') || msg.includes('not supported')) {
+                    return {
+                        success: false,
+                        error: "This Gemini API key is not supported in your current region or location. Please try a different API key or use a VPN.",
+                        isRateLimited: false
+                    };
                 }
 
                 // If it's a structural error (e.g. wrong input), don't bother trying other models

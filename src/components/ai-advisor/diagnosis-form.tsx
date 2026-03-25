@@ -14,6 +14,7 @@ import { diagnosePestDisease, DiagnosePestDiseaseOutput } from "@/ai/flows/ai-pe
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { UploadCloud, CheckCircle, AlertTriangle, Bot, Sparkles, ScanLine, Leaf } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { useTranslations, useLocale } from "next-intl";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -29,6 +30,7 @@ export function DiagnosisForm() {
   const locale = useLocale();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosePestDiseaseOutput | null>(null);
+  const [isSafeModeResult, setIsSafeModeResult] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [responseLanguage, setResponseLanguage] = useState<'en' | 'am' | 'om' | 'ti' | 'so'>(locale as any || 'en');
@@ -113,33 +115,65 @@ export function DiagnosisForm() {
 
         if (result.success && result.data) {
           setDiagnosisResult(result.data);
+          setIsSafeModeResult(result.isMock || false);
           toast({
             title: t('ai.diagnosis_complete') || "Diagnosis Complete",
             description: t('ai.diagnosis_complete_desc') || "AI has analyzed your crop image.",
             action: <CheckCircle className="text-green-500" />,
           });
         } else {
-          // Handle specific AI errors (Rate Limit, etc.)
-          const msg = result.error || "AI analysis failed.";
-          setError(msg);
+          // If the AI service failed, we show a Safe Mode diagnosis with user-friendly messaging.
+          const code = result.error || "AI_SERVICE_UNAVAILABLE";
 
-          if (result.isRateLimited) {
-            toast({
-              title: "AI Service Busy",
-              description: "We're hitting temporary limits. Try 'Safe Mode' for a simulated diagnosis or wait a minute.",
-              variant: "destructive",
-            });
+          let friendlyDiagnosis = "Safe-Mode Diagnosis (Demo)";
+          let friendlySolution =
+            "Our real-time AI services are temporarily unavailable. This is a demonstration diagnosis only. For urgent issues, please consult your local agricultural extension worker.";
 
-            // Auto-provide a high-quality mock if they are stuck
-            setDiagnosisResult({
-              diagnosis: "Likely Powdery Mildew (Oidium spp.) - [DEMO MODE]",
-              solution: "Your photo shows signs of possible Powdery Mildew. Remove infected leaves immediately. Consider using a domestic baking soda/water spray or a sulfur-based fungicide. (Note: This is a safe-mode diagnosis because real AI is currently over-quota)."
-            });
+          if (code === "GEMINI_REGION_RESTRICTED") {
+            friendlyDiagnosis = "AI Service Restricted in Your Region";
+            friendlySolution =
+              "Google Gemini is not available in this region for your current API key. The app has switched to a safe-mode diagnosis. Please contact the Azmera team if you need full AI support in production.";
+          } else if (code === "SPECIALIST_KEY_ERROR") {
+            friendlyDiagnosis = "Specialist Diagnosis Not Configured";
+            friendlySolution =
+              "The specialist plant-disease service (Plant.id) is not fully configured for this environment. The Azmera AI advisor is running in safe mode. Please contact the platform administrator to configure the correct API keys.";
+          } else if (code === "SPECIALIST_RATE_LIMITED") {
+            friendlyDiagnosis = "Specialist Service Temporarily Over Capacity";
+            friendlySolution =
+              "The specialist plant-disease service has reached its free-tier limit. You can retry in a few minutes or upgrade the API plan for continuous real-time diagnoses. The current result is a safe-mode demonstration.";
+          } else if (result.isRateLimited) {
+            friendlyDiagnosis = "AI Service Temporarily Busy";
+            friendlySolution =
+              "Our AI translation service is temporarily at maximum capacity. Please wait a minute and try again, or contact the Azmera team about upgrading to a higher-capacity key. In the meantime, use traditional scouting and local expertise.";
           }
+
+          // Surface only a short, friendly error line to the inline alert
+          setError(friendlyDiagnosis);
+          setIsSafeModeResult(true); // Always true if AI service failed
+          setDiagnosisResult({
+            diagnosis: friendlyDiagnosis,
+            solution: friendlySolution,
+          });
+
+          const toastDescription =
+            code === "SPECIALIST_RATE_LIMITED" || result.isRateLimited
+              ? "Real-time AI hit a temporary usage limit. We have switched to safe-mode diagnosis. Please try again shortly."
+              : "Real-time AI is not fully available in this environment. The current result is a safe-mode demonstration.";
+
+          toast({
+            title: t('ai.safe_mode_active') || "Safe Mode Active",
+            description: toastDescription,
+            variant: "destructive",
+          });
         }
       } catch (err) {
         console.error('AI Diagnosis Unexpected Error:', err);
         setError(`Failed to analyze image: ${err instanceof Error ? err.message : String(err)}`);
+        toast({
+          title: "Unexpected Error",
+          description: `Failed to analyze image: ${err instanceof Error ? err.message : String(err)}`,
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -271,12 +305,14 @@ export function DiagnosisForm() {
             </Alert>
           )}
 
-          {diagnosisResult && error && !isLoading && (
+          {diagnosisResult && isSafeModeResult && !isLoading && (
             <div className="mb-4">
               <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 animate-pulse">
-                Safe Mode Active
+                {t('ai.safe_mode_active') || "Safe Mode Active"}
               </Badge>
-              <p className="text-xs text-muted-foreground mt-1">Real-time AI is busy; using local diagnosis logic.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {responseLanguage === 'am' ? "የእውነተኛ ጊዜ AI ሥራ የሚበዛበት ነው፤ የአካባቢ ምርመራን በመጠቀም ላይ።" : "Real-time AI is busy; using local diagnosis logic."}
+              </p>
             </div>
           )}
 
