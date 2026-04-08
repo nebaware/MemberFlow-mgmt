@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { auth, db } from './firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import api from './services';
 import { Member } from './types';
 
 interface AuthContextType {
-  user: User | null;
-  member: Member | null;
+  user: any | null;
+  member: any | null;
   loading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = React.createContext<AuthContextType>({
@@ -16,45 +17,56 @@ const AuthContext = React.createContext<AuthContextType>({
   member: null,
   loading: true,
   isAdmin: false,
+  isSuperAdmin: false,
+  login: async () => {},
+  logout: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [member, setMember] = useState<Member | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        // Fetch member data
-        const memberRef = doc(db, 'members', firebaseUser.uid);
-        const memberSnap = await getDoc(memberRef);
-        if (memberSnap.exists()) {
-          setMember({ id: memberSnap.id, ...memberSnap.data() } as Member);
+    const checkAuth = async () => {
+      const token = localStorage.getItem('memberflow_token');
+      if (token) {
+        try {
+          const res = await api.get('/auth/me');
+          setUser(res.data.user);
+          setMember(res.data.user);
+          setIsAdmin(res.data.user.role === 'org_admin' || res.data.user.role === 'super_admin');
+          setIsSuperAdmin(res.data.user.role === 'super_admin');
+        } catch (err) {
+          localStorage.removeItem('memberflow_token');
         }
-
-        // Check admin status
-        const userRef = doc(db, 'users', firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists() && userSnap.data().role === 'admin') {
-          setIsAdmin(true);
-        } else if (firebaseUser.email === 'nebiyutsegaye213@gmail.com') {
-          setIsAdmin(true); // Default admin
-        }
-      } else {
-        setMember(null);
-        setIsAdmin(false);
       }
       setLoading(false);
-    });
-
-    return unsubscribe;
+    };
+    checkAuth();
   }, []);
 
+  const login = async (email: string, password: string) => {
+     const res = await api.post('/auth/login', { email, password });
+     localStorage.setItem('memberflow_token', res.data.token);
+     setUser(res.data.user);
+     setMember(res.data.user);
+     setIsAdmin(res.data.user.role === 'org_admin' || res.data.user.role === 'super_admin');
+     setIsSuperAdmin(res.data.user.role === 'super_admin');
+  };
+
+  const logout = () => {
+    localStorage.removeItem('memberflow_token');
+    setUser(null);
+    setMember(null);
+    setIsAdmin(false);
+    setIsSuperAdmin(false);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, member, loading, isAdmin }}>
+    <AuthContext.Provider value={{ user, member, loading, isAdmin, isSuperAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

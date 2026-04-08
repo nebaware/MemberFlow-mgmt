@@ -1,62 +1,49 @@
-# MemberFlow-Pro: Enterprise Membership Management
+# MemberFlow-Pro: Self-Contained Membership Management
 
-A high-end, full-stack membership management system tailored for the Ethiopian market, featuring Fayda ID integration, Telebirr payments, and AI-powered OCR verification.
+**MemberFlow-Pro** is a zero-configuration, professional-grade platform designed for organizations to manage members, process payments via Telebirr/Manual, and perform AI-driven verification—all from a single, locally-hosted dashboard.
 
-## 🚀 Core Features
+## ✨ Features
 
-### 🛡️ Secure Identity
-- **Fayda ID Verification**: Built-in support for Ethiopian National ID validation.
-- **OTP Authentication**: Multi-factor security for user registration.
+- **🛡️ Secure JWT Authentication**: Full user flow with encrypted sessions and password hashing, managed entirely locally.
+- **📱 Fayda Identity Support**: Seamless verification of Ethiopian National IDs.
+- **⚡ AI OCR Verification**: Automated analysis of payment screenshots using backend-integrated Tesseract.js.
+- **📊 Real-time Dashboard**: Comprehensive analytics, member directory, and financial reporting.
+- **📄 Automated Invoicing**: Generate professional PDF receipts for all membership transactions.
+- **🎨 Midnight Emerald UI**: A premium, futuristic interface with rich animations and glassmorphism.
 
-### 💳 Modern Payments
-- **Telebirr Integration**: Direct H5 payment flow and QR code generation.
-- **AI OCR Screenshot Verification**: Upload a screenshot of your payment receipt; our system automatically extracts the ID and amount.
-- **Automated Invoicing**: Instant PDF receipts for every transaction.
+## 🚀 Quick Start (Zero-Config)
 
-### 📊 Administrative Hub
-- **Real-time Analytics**: Monitor revenue, active members, and growth trends.
-- **Member Oversight**: Easy approval/suspension workflow.
-- **Custom Attributes**: Define unique data fields (e.g., "Department", "ID Expiry") for your specific organization.
+### 1. Installation
+```powershell
+# Install all dependencies (Frontend & Backend)
+npm install
+cd server
+npm install
+cd ..
+```
 
-## 🛠️ Technology Stack
-- **Frontend**: React, Vite, Tailwind CSS, Motion (Framer Motion)
-- **Backend**: Node.js, Express, TypeScript
-- **Database**: Firebase Firestore
-- **Tools**: Tesseract.js (OCR), pdf-lib (Invoicing), Lucide React (Icons)
+### 2. Launch
+```powershell
+# Run the complete Full-Stack system locally
+npm run dev:fullstack
+```
+The Frontend will be available at `http://localhost:3000` and the Backend API at `http://localhost:3001`.
 
-## 📦 Installation & Setup
+### 3. Admin Access
+Standard credentials for the initial dashboard:
+- **Email**: `nebiyutsegaye213@gmail.com`
+- **Password**: `admin123`
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/nebaware/MemberFlow-mgmt.git
-   ```
+## 🛠️ System Architecture
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+- **Frontend**: React, Tailwind CSS, Framer Motion, Axios, Lucide Icons.
+- **Backend**: Node.js/Express, JWT, BCrypt, Multer, Tesseract.js, PDF-Lib.
+- **Persistence**: `server/db.json` (Local file-based database).
 
-3. **Configure Environment**:
-   Create a `.env` file based on `.env.example`:
-   ```env
-   GEMINI_API_KEY=your_key_here
-   VITE_FIREBASE_CONFIG=...
-   ```
-
-4. **Run the application**:
-   ```bash
-   # Start frontend and backend concurrently
-   npm run dev:fullstack
-   ```
-
-## 📸 System Previews
-
-| Login & Security | Administrative Hub | Payment & OCR |
-|------------------|-------------------|---------------|
-| ![Login](docs/assets/login_view.png) | ![Dashboard](docs/assets/admin_hub.png) | ![OCR](docs/assets/ocr_verify.png) |
-
-
-
+## 🌍 Self-Hosted Benefits
+- **Zero External API Costs**: No Firebase limits or usage fees.
+- **Complete Privacy**: All data stays on your local machine.
+- **Instant Deployment**: No cloud setup, environment variables, or complex configuration required.
 
 ---
-Developed by **Nebaware** | Empowering Ethiopian Organizations.
+*Powered by MemberFlow High-Energy Frameworks.*

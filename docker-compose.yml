@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=memberflow-pro-secret-key-123456
+    volumes:
+      - .db_data:/app/server
+    restart: always
+
+volumes:
+  .db_data:

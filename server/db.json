@@ -1,0 +1,395 @@
+{
+  "organizations": [
+    {
+      "id": "org-main",
+      "name": "MemberFlow Pro Organization",
+      "slug": "memberflow-main",
+      "description": "The primary demonstration organization.",
+      "status": "suspended",
+      "config": {
+        "customAttributeDefinitions": [
+          {
+            "name": "org_unit",
+            "label": "Organization Unit",
+            "type": "select",
+            "options": [
+              "Engineering",
+              "Marketing",
+              "Operations",
+              "Finance"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "org-19d6c682d23",
+      "name": "nebaz.org",
+      "slug": "sdsdafs",
+      "description": "hukhukhkhh",
+      "status": "suspended",
+      "createdAt": "2026-04-08T09:24:19.875Z",
+      "config": {
+        "customAttributeDefinitions": []
+      }
+    }
+  ],
+  "users": [
+    {
+      "uid": "super-admin-uid",
+      "fullName": "System Owner",
+      "email": "nebiyutsegaye213@gmail.com",
+      "password": "$2b$10$u.ujfVFKY3Ia6EHnl8oXOOcvfGHKAu./Og0e.MY04VCgi2cbzcAtu",
+      "role": "super_admin",
+      "status": "active",
+      "createdAt": "2026-03-25T08:11:32.443Z"
+    },
+    {
+      "uid": "org-admin-uid",
+      "fullName": "Organization Manager",
+      "email": "admin@memberflow.pro",
+      "password": "$2b$10$u.ujfVFKY3Ia6EHnl8oXOOcvfGHKAu./Og0e.MY04VCgi2cbzcAtu",
+      "role": "org_admin",
+      "orgId": "org-main",
+      "status": "active",
+      "createdAt": "2026-03-25T08:11:32.443Z"
+    },
+    {
+      "uid": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "fullName": "neba tsegaye",
+      "email": "nebaware@gmail.com",
+      "password": "$2b$10$1egslFw/RF97CgXgeQ6Xb.E4.H1cKTm1jq6M2MrZif4WGwW46nFxm",
+      "phoneNumber": "0909656614",
+      "faydaId": "1234567890",
+      "orgId": "org-main",
+      "role": "member",
+      "status": "active",
+      "createdAt": "2026-04-08T08:55:03.390Z",
+      "customAttributes": {},
+      "profilePhotoUrl": "",
+      "updatedAt": "2026-04-08T09:09:04.670Z"
+    },
+    {
+      "uid": "0886949b-308f-4156-9d26-81d1091be9d6",
+      "fullName": "nebaz",
+      "email": "nebazonline@gmail.com",
+      "password": "$2b$10$UEZ7hE/SDyFwkuFSpv6icunItxDnBYaOOyDQOnyQTP77s0Ad/Ik1O",
+      "phoneNumber": "0909656614",
+      "orgId": "org-main",
+      "role": "member",
+      "status": "active",
+      "createdAt": "2026-04-08T09:10:03.112Z",
+      "customAttributes": {},
+      "profilePhotoUrl": "",
+      "lastActiveAt": null
+    }
+  ],
+  "payments": [
+    {
+      "id": "e6643ea7-e50d-4585-8c49-44f16fa6ad74",
+      "memberId": "org-admin-uid",
+      "orgId": "org-main",
+      "createdAt": "2026-04-08T09:01:54.645Z",
+      "updatedAt": "2026-04-08T09:02:02.048Z",
+      "status": "completed",
+      "type": "payment",
+      "invoiceId": "INV-1775638914645",
+      "receiptId": "REC-1775638922048",
+      "amount": 500,
+      "currency": "ETB",
+      "method": "telebirr",
+      "transactionId": "T-654F0D97"
+    },
+    {
+      "id": "8fa79cb5-b11b-4930-a42a-f38489ea0e1b",
+      "memberId": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "orgId": "org-main",
+      "createdAt": "2026-04-08T09:07:52.939Z",
+      "updatedAt": "2026-04-08T09:12:19.925Z",
+      "status": "completed",
+      "type": "payment",
+      "invoiceId": "INV-1775639272939",
+      "receiptId": "REC-1775639539925",
+      "amount": 500,
+      "currency": "ETB",
+      "method": "telebirr",
+      "transactionId": "T-3F866534"
+    },
+    {
+      "id": "cf3c86d1-bedc-484b-b36c-3dcd6b2d209a",
+      "memberId": "org-admin-uid",
+      "orgId": "org-main",
+      "createdAt": "2026-04-08T09:10:52.102Z",
+      "updatedAt": "2026-04-08T09:11:07.429Z",
+      "status": "completed",
+      "type": "payment",
+      "invoiceId": "INV-1775639452102",
+      "receiptId": "REC-1775639467429",
+      "amount": 500,
+      "currency": "ETB",
+      "method": "telebirr",
+      "transactionId": "T-E2618209"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-664a8c4a",
+      "orgId": "org-main",
+      "title": "game night",
+      "description": "next week, attend",
+      "date": "2026-04-16T00:13",
+      "location": "Dire dawa",
+      "capacity": 12,
+      "imageUrl": "",
+      "attendees": [],
+      "status": "published",
+      "createdAt": "2026-04-08T09:13:48.860Z",
+      "updatedAt": "2026-04-08T09:14:04.549Z",
+      "publishedAt": "2026-04-08T09:13:48.860Z",
+      "lastReminderAt": "2026-04-08T09:14:04.549Z"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "blog-afb23e78",
+      "orgId": "org-main",
+      "authorId": "org-admin-uid",
+      "title": "started",
+      "content": "new",
+      "category": "Update",
+      "status": "published",
+      "isPublic": true,
+      "createdAt": "2026-04-08T09:14:46.681Z",
+      "updatedAt": "2026-04-08T09:14:53.379Z",
+      "publishedAt": "2026-04-08T09:14:53.379Z"
+    }
+  ],
+  "systemConfig": {
+    "systemName": "MemberFlow OMMS",
+    "defaultTheme": "midnight-emerald"
+  },
+  "auditLogs": [
+    {
+      "id": "audit-1775640309265-3f7ef7",
+      "timestamp": "2026-04-08T09:25:09.265Z",
+      "actorUid": "super-admin-uid",
+      "actorRole": "super_admin",
+      "action": "super_admin.system_config.update",
+      "entityType": "system_config",
+      "details": {
+        "fields": [
+          "systemName",
+          "defaultTheme"
+        ]
+      }
+    },
+    {
+      "id": "audit-1775640266441-0af590",
+      "timestamp": "2026-04-08T09:24:26.441Z",
+      "actorUid": "super-admin-uid",
+      "actorRole": "super_admin",
+      "action": "super_admin.org.suspend",
+      "entityType": "organization",
+      "entityId": "org-19d6c682d23"
+    },
+    {
+      "id": "audit-1775640259877-843515",
+      "timestamp": "2026-04-08T09:24:19.877Z",
+      "actorUid": "super-admin-uid",
+      "actorRole": "super_admin",
+      "action": "super_admin.org.create",
+      "entityType": "organization",
+      "entityId": "org-19d6c682d23"
+    },
+    {
+      "id": "audit-1775640236992-a7e79e",
+      "timestamp": "2026-04-08T09:23:56.992Z",
+      "actorUid": "super-admin-uid",
+      "actorRole": "super_admin",
+      "action": "super_admin.org.suspend",
+      "entityType": "organization",
+      "entityId": "org-main"
+    },
+    {
+      "id": "audit-1775639693381-99b588",
+      "timestamp": "2026-04-08T09:14:53.381Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "blog.update",
+      "entityType": "blog",
+      "entityId": "blog-afb23e78",
+      "details": {
+        "fields": [
+          "status"
+        ]
+      }
+    },
+    {
+      "id": "audit-1775639686683-0079de",
+      "timestamp": "2026-04-08T09:14:46.683Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "blog.create",
+      "entityType": "blog",
+      "entityId": "blog-afb23e78",
+      "details": {
+        "status": "draft"
+      }
+    },
+    {
+      "id": "audit-1775639644550-c98c2e",
+      "timestamp": "2026-04-08T09:14:04.550Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "event.reminder.trigger",
+      "entityType": "event",
+      "entityId": "evt-664a8c4a",
+      "details": {
+        "attendeeCount": 0
+      }
+    },
+    {
+      "id": "audit-1775639628862-96f981",
+      "timestamp": "2026-04-08T09:13:48.862Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "event.create",
+      "entityType": "event",
+      "entityId": "evt-664a8c4a",
+      "details": {
+        "status": "published"
+      }
+    },
+    {
+      "id": "audit-1775639539927-4af423",
+      "timestamp": "2026-04-08T09:12:19.927Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "payment.update",
+      "entityType": "payment",
+      "entityId": "8fa79cb5-b11b-4930-a42a-f38489ea0e1b",
+      "details": {
+        "status": "completed"
+      }
+    },
+    {
+      "id": "audit-1775639467430-3138f8",
+      "timestamp": "2026-04-08T09:11:07.430Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "payment.update",
+      "entityType": "payment",
+      "entityId": "cf3c86d1-bedc-484b-b36c-3dcd6b2d209a",
+      "details": {
+        "status": "completed"
+      }
+    },
+    {
+      "id": "audit-1775639452104-849c75",
+      "timestamp": "2026-04-08T09:10:52.104Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "payment.create",
+      "entityType": "payment",
+      "entityId": "cf3c86d1-bedc-484b-b36c-3dcd6b2d209a",
+      "details": {
+        "type": "payment",
+        "amount": 500,
+        "method": "telebirr"
+      }
+    },
+    {
+      "id": "audit-1775639403114-f3f080",
+      "timestamp": "2026-04-08T09:10:03.114Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "member.create",
+      "entityType": "member",
+      "entityId": "0886949b-308f-4156-9d26-81d1091be9d6",
+      "details": {
+        "email": "nebazonline@gmail.com",
+        "role": "member"
+      }
+    },
+    {
+      "id": "audit-1775639344671-f6aa3e",
+      "timestamp": "2026-04-08T09:09:04.672Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "member.update",
+      "entityType": "member",
+      "entityId": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "details": {
+        "fields": [
+          "status"
+        ]
+      }
+    },
+    {
+      "id": "audit-1775639272941-17fd93",
+      "timestamp": "2026-04-08T09:07:52.941Z",
+      "actorUid": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "actorRole": "member",
+      "orgId": "org-main",
+      "action": "payment.create",
+      "entityType": "payment",
+      "entityId": "8fa79cb5-b11b-4930-a42a-f38489ea0e1b",
+      "details": {
+        "type": "payment",
+        "amount": 500,
+        "method": "telebirr"
+      }
+    },
+    {
+      "id": "audit-1775638922049-306d71",
+      "timestamp": "2026-04-08T09:02:02.049Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "payment.update",
+      "entityType": "payment",
+      "entityId": "e6643ea7-e50d-4585-8c49-44f16fa6ad74",
+      "details": {
+        "status": "completed"
+      }
+    },
+    {
+      "id": "audit-1775638914646-64b4e1",
+      "timestamp": "2026-04-08T09:01:54.646Z",
+      "actorUid": "org-admin-uid",
+      "actorRole": "org_admin",
+      "orgId": "org-main",
+      "action": "payment.create",
+      "entityType": "payment",
+      "entityId": "e6643ea7-e50d-4585-8c49-44f16fa6ad74",
+      "details": {
+        "type": "payment",
+        "amount": 500,
+        "method": "telebirr"
+      }
+    },
+    {
+      "id": "audit-1775638503415-9217f9",
+      "timestamp": "2026-04-08T08:55:03.415Z",
+      "actorUid": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "actorRole": "member",
+      "orgId": "org-main",
+      "action": "auth.register",
+      "entityType": "user",
+      "entityId": "c021bfd8-6648-47a8-a504-914433297f9c",
+      "details": {
+        "role": "member"
+      }
+    }
+  ],
+  "subscriptions": []
+}
