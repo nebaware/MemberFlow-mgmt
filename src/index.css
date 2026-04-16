@@ -1,1 +1,50 @@
 @import "tailwindcss";
+
+/* Global Styles using Standard CSS variables 
+  to avoid @theme and @apply errors in VS Code
+*/
+
+:root {
+  --emerald-main: #10b981;
+  --bg-dark: #0c0a09;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: #fafaf9;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+  background: rgba(28, 25, 23, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+}
+
+/* Gradient Text for Headlines */
+.emerald-gradient-text {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  /* -webkit-background-clip: text; */
+  -webkit-text-fill-color: transparent;
+}
+
+/* Premium Button Style */
+.btn-emerald {
+  background-color: var(--emerald-main);
+  color: #0c0a09;
+  font-weight: 800;
+  padding: 0.8rem 2rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-emerald:hover {
+  background-color: #34d399;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}

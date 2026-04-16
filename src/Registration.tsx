@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   User, Mail, Phone, Lock, ArrowRight, CheckCircle, 
-  ShieldCheck, Smartphone, Search, Loader2, X
+  ShieldCheck, Smartphone, Search, Loader2, X, Building2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from './services';
 
@@ -35,10 +35,8 @@ const Registration: React.FC = () => {
   const validateIdentityInputs = () => {
     const phoneDigits = normalizeDigits(formData.phoneNumber);
     const faydaDigits = normalizeDigits(formData.faydaId);
-
     if (phoneDigits.length < 10) return { ok: false as const, message: 'Phone number must be at least 10 digits' };
     if (faydaDigits.length !== 10) return { ok: false as const, message: 'Fayda ID must be exactly 10 digits' };
-
     return { ok: true as const, phoneDigits, faydaDigits };
   };
 
@@ -85,14 +83,12 @@ const Registration: React.FC = () => {
     }
     setLoading(true);
     try {
-      // Persist normalized values so final registration never sends formatted/short values.
       setFormData(prev => ({ ...prev, phoneNumber: valid.phoneDigits, faydaId: valid.faydaDigits }));
-
       await api.post('/otp/send', { phoneNumber: valid.phoneDigits });
       setStep(otpBypassEnabled ? 3 : 2);
       setResendTimer(30);
     } catch (err) {
-      setError('Identity verification failed to initialize');
+      setError('Identity verification failed');
     } finally {
       setLoading(false);
     }
@@ -126,7 +122,6 @@ const Registration: React.FC = () => {
       setStep(1);
       return;
     }
-
     setLoading(true);
     try {
       const res = await api.post('/auth/register', {
@@ -146,16 +141,17 @@ const Registration: React.FC = () => {
     }
   };
 
-  const handleCustomAttrChange = (name: string, value: any) => {
-    setCustomAttributes(prev => ({ ...prev, [name]: value }));
-  };
-
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4 font-sans text-stone-900">
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 relative overflow-hidden font-sans text-white">
+      
+      {/* Background Glows */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 blur-[150px] rounded-full -z-10" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 blur-[150px] rounded-full -z-10" />
+
       <motion.div 
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-2xl max-w-2xl w-full border border-stone-200"
+        className="bg-stone-900/40 backdrop-blur-2xl p-8 md:p-12 rounded-[3.5rem] shadow-3xl max-w-2xl w-full border border-white/5 relative"
       >
         <AnimatePresence mode="wait">
           {step === 0 && (
@@ -167,14 +163,14 @@ const Registration: React.FC = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-2">
-                <div className="w-20 h-20 bg-stone-900 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-stone-200">
-                  <ShieldCheck className="text-emerald-400 w-12 h-12" />
+                <div className="w-20 h-20 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/20">
+                  <Building2 className="text-black w-10 h-10" />
                 </div>
-                <h2 className="text-4xl font-black uppercase tracking-tighter">Select Organization</h2>
-                <p className="text-stone-400 text-sm font-bold uppercase tracking-widest">Connect with your community to continue</p>
+                <h2 className="text-4xl font-black uppercase tracking-tighter">Select Entity</h2>
+                <p className="text-stone-500 text-[10px] font-bold uppercase tracking-[0.2em]">Choose an organization to continue</p>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                 {organizations.map(org => (
                   <button 
                     key={org.id} 
@@ -183,59 +179,52 @@ const Registration: React.FC = () => {
                       setConfig(org);
                       setStep(1);
                     }}
-                    className="flex items-center justify-between p-8 bg-stone-50 border border-stone-100 rounded-[3rem] hover:bg-stone-900 hover:text-white transition-all group text-left"
+                    className="flex items-center justify-between p-6 bg-stone-950/50 border border-white/5 rounded-[2rem] hover:border-emerald-500/50 transition-all group text-left"
                   >
                     <div>
-                      <div className="font-black uppercase tracking-tight text-xl">{org.name}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-1">{org.slug}.memberflow.pro</div>
+                      <div className="font-black uppercase tracking-tight text-lg text-white">{org.name}</div>
+                      <div className="text-[9px] font-bold uppercase tracking-widest text-stone-600 mt-1">{org.slug}.system</div>
                     </div>
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                      <ArrowRight className="w-6 h-6 group-hover:text-white transition-colors" />
+                    <div className="w-10 h-10 bg-stone-900 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                      <ArrowRight className="w-5 h-5 group-hover:text-black transition-colors" />
                     </div>
                   </button>
                 ))}
               </div>
 
-              <div className="text-center pt-6">
-                <Link to="/login" className="text-xs font-black text-stone-400 hover:text-stone-900 transition-colors uppercase tracking-[0.3em]">Already have an account? Sign In</Link>
+              <div className="text-center pt-4 border-t border-white/5">
+                <Link to="/login" className="text-[10px] font-black text-stone-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.3em]">Already Registered? Sign In</Link>
               </div>
             </motion.div>
           )}
 
           {step === 1 && (
-            <motion.div 
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
+            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
               <div className="text-center space-y-2">
-                <h2 className="text-3xl font-black uppercase tracking-tighter">Identity Check</h2>
-                <p className="text-stone-400 text-sm font-bold uppercase tracking-widest">Registering for {config?.name}</p>
+                <h2 className="text-3xl font-black uppercase tracking-tighter">Security Check</h2>
+                <p className="text-stone-500 text-[10px] font-bold uppercase tracking-widest">Verifying Identity for {config?.name}</p>
               </div>
 
-              <div className="space-y-6">
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">Phone Number</label>
-                  <div className="relative">
-                    <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-5 h-5" />
-                    <input name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} className="w-full pl-12 pr-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold" placeholder="0911223344" required />
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">Phone Identity</label>
+                  <div className="relative group">
+                    <Smartphone className="absolute left-5 top-1/2 -translate-y-1/2 text-stone-700 group-focus-within:text-emerald-400 w-5 h-5 transition-colors" />
+                    <input name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} className="w-full pl-14 pr-6 py-5 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder="0911000000" required />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">Fayda ID Number</label>
-                  <div className="relative">
-                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-5 h-5" />
-                    <input name="faydaId" value={formData.faydaId} onChange={handleInputChange} className="w-full pl-12 pr-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold" placeholder="ID-123-456-789" required />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">National ID (Fayda)</label>
+                  <div className="relative group">
+                    <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-stone-700 group-focus-within:text-emerald-400 w-5 h-5 transition-colors" />
+                    <input name="faydaId" value={formData.faydaId} onChange={handleInputChange} className="w-full pl-14 pr-6 py-5 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder="1234567890" required />
                   </div>
                 </div>
-                {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold">{error}</div>}
-                
+                {error && <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl text-[11px] font-bold border border-red-500/20">{error}</div>}
                 <div className="flex gap-4 pt-4">
-                  {!orgSlug && <button onClick={() => setStep(0)} className="p-4 bg-stone-100 text-stone-400 rounded-2xl hover:bg-stone-200 transition-all"><ArrowRight className="w-6 h-6 rotate-180" /></button>}
-                  <button onClick={handleRequestOtp} disabled={loading} className="flex-1 bg-stone-900 text-white font-black py-4 rounded-2xl hover:bg-stone-800 transition-all shadow-xl shadow-stone-200 uppercase tracking-widest flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Verify & Continue"}
+                  {!orgSlug && <button onClick={() => setStep(0)} className="p-5 bg-stone-900/50 border border-white/5 text-stone-500 rounded-2xl hover:text-white transition-all"><ArrowRight className="w-5 h-5 rotate-180" /></button>}
+                  <button onClick={handleRequestOtp} disabled={loading} className="flex-1 bg-white text-black font-black py-5 rounded-2xl hover:bg-emerald-400 transition-all uppercase tracking-widest flex items-center justify-center gap-2">
+                    {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Request Access"}
                   </button>
                 </div>
               </div>
@@ -243,107 +232,60 @@ const Registration: React.FC = () => {
           )}
 
           {step === 2 && (
-            <motion.div 
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
               <div className="text-center space-y-2">
-                <h2 className="text-3xl font-black uppercase tracking-tighter">Verify OTP</h2>
-                <p className="text-stone-400 text-sm font-bold uppercase tracking-widest">Enter the code sent to your device</p>
+                <h2 className="text-3xl font-black uppercase tracking-tighter">OTP Verification</h2>
+                <p className="text-stone-500 text-[10px] font-bold uppercase tracking-widest">6-digit security code</p>
               </div>
-
               <div className="space-y-6">
-                <div className="space-y-1 text-center">
-                  <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest mb-4">6-Digit Code</label>
-                  <input name="otp" value={formData.otp} onChange={handleInputChange} className="w-full text-center text-4xl font-black tracking-[0.5em] py-6 bg-stone-50 border border-stone-100 rounded-[2.5rem] focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all" placeholder="000000" maxLength={6} required />
-                </div>
-                {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold text-center">{error}</div>}
+                <input name="otp" value={formData.otp} onChange={handleInputChange} className="w-full text-center text-5xl font-black tracking-[0.4em] py-8 bg-stone-950/50 border border-white/5 rounded-[2.5rem] focus:border-emerald-500/50 outline-none transition-all text-emerald-400" placeholder="000000" maxLength={6} required />
+                {error && <div className="p-4 bg-red-500/10 text-red-400 rounded-2xl text-xs font-bold text-center">{error}</div>}
                 <div className="text-center">
-                  <button onClick={handleRequestOtp} disabled={resendTimer > 0} className="text-xs font-black text-emerald-600 hover:text-emerald-700 uppercase tracking-widest disabled:text-stone-300">
-                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Security Code"}
+                  <button onClick={handleRequestOtp} disabled={resendTimer > 0} className="text-[10px] font-black text-emerald-500 hover:text-emerald-400 uppercase tracking-widest disabled:text-stone-700">
+                    {resendTimer > 0 ? `Retry in ${resendTimer}s` : "Resend Security Code"}
                   </button>
                 </div>
-                {otpBypassEnabled && (
-                  <div className="text-center text-[10px] font-black uppercase tracking-widest text-stone-400">
-                    Dev bypass enabled: enter <span className="text-stone-900">000000</span> or{' '}
-                    <button type="button" onClick={() => setStep(3)} className="text-emerald-600 hover:text-emerald-700 underline">
-                      skip OTP
-                    </button>
-                  </div>
-                )}
-                <button onClick={handleVerifyOtp} disabled={loading} className="w-full bg-stone-900 text-white font-black py-5 rounded-2xl hover:bg-stone-800 transition-all shadow-xl shadow-stone-200 uppercase tracking-widest flex items-center justify-center gap-2">
-                  {loading ? <Loader2 className="animate-spin w-6 h-6" /> : "Confirm Security Check"}
+                <button onClick={handleVerifyOtp} disabled={loading} className="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-emerald-400 transition-all uppercase tracking-widest flex items-center justify-center gap-2">
+                  {loading ? <Loader2 className="animate-spin w-6 h-6" /> : "Verify Identity"}
                 </button>
               </div>
             </motion.div>
           )}
 
           {step === 3 && (
-            <motion.form 
-              key="step3"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              onSubmit={handleFinalRegister} 
-              className="space-y-6"
-            >
+            <motion.form key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} onSubmit={handleFinalRegister} className="space-y-6">
               <div className="text-center space-y-2 mb-8">
-                <h2 className="text-3xl font-black uppercase tracking-tighter">Final Details</h2>
-                <p className="text-stone-400 text-sm font-bold uppercase tracking-widest">Complete your professional profile</p>
+                <h2 className="text-3xl font-black uppercase tracking-tighter">Profile Setup</h2>
+                <p className="text-stone-500 text-[10px] font-bold uppercase tracking-widest">Complete registration for {config?.name}</p>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">Full Legal Name</label>
-                  <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold" placeholder="Abebe Bikila" required />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">Full Name</label>
+                  <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder="Full Legal Name" required />
                 </div>
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">Email Address</label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold" placeholder="abebe@example.com" required />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">Email Address</label>
+                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder="email@domain.com" required />
                 </div>
               </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">Secure Password</label>
-                <input type="password" name="password" value={formData.password} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold" placeholder="••••••••" required />
-              </div>
-
-              {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold">{error}</div>}
-
-              <div className="flex justify-between items-center">
-                <button type="button" onClick={() => setStep(1)} className="text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900">
-                  Edit phone / Fayda ID
-                </button>
-                <div className="text-[10px] font-black uppercase tracking-widest text-stone-400">
-                  Phone: {normalizeDigits(formData.phoneNumber)} · Fayda: {normalizeDigits(formData.faydaId)}
-                </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">Secure Password</label>
+                <input type="password" name="password" value={formData.password} onChange={handleInputChange} className="w-full px-6 py-4 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder="••••••••" required />
               </div>
 
               {config?.customAttributeDefinitions?.length > 0 && (
-                <div className="space-y-4 pt-6 border-t border-stone-50">
-                  <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] pl-1">Organizational Requirements</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {config.customAttributeDefinitions.map((attr: any) => (
-                      <div key={attr.name} className="space-y-1">
-                        <label className="block text-[10px] font-black uppercase text-stone-400 tracking-widest pl-2">{attr.label}</label>
-                        {attr.type === 'select' ? (
-                          <select value={customAttributes[attr.name] || ''} onChange={(e) => handleCustomAttrChange(attr.name, e.target.value)} className="w-full px-4 py-2 bg-stone-50 border border-stone-100 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all" required>
-                            <option value="">Select...</option>
-                            {attr.options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
-                          </select>
-                        ) : (
-                          <input type={attr.type} value={customAttributes[attr.name] || ''} onChange={(e) => handleCustomAttrChange(attr.name, e.target.value)} className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all" placeholder={attr.label} required />
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                <div className="pt-6 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {config.customAttributeDefinitions.map((attr: any) => (
+                    <div key={attr.name} className="space-y-2">
+                      <label className="block text-[10px] font-black uppercase text-stone-600 tracking-widest pl-2">{attr.label}</label>
+                      <input type={attr.type} className="w-full px-6 py-4 bg-stone-950/50 border border-white/5 rounded-2xl focus:border-emerald-500/50 outline-none transition-all font-bold text-sm" placeholder={attr.label} required onChange={(e) => setCustomAttributes(p => ({...p, [attr.name]: e.target.value}))}/>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              <button type="submit" disabled={loading} className="w-full bg-stone-900 text-white font-black py-5 rounded-2xl hover:bg-stone-800 transition-all shadow-2xl shadow-stone-200 uppercase tracking-widest flex items-center justify-center gap-3">
-                {loading ? <Loader2 className="animate-spin w-6 h-6" /> : "Complete Professional Onboarding"}
+              <button type="submit" disabled={loading} className="w-full bg-emerald-500 text-black font-black py-5 rounded-2xl hover:bg-emerald-400 transition-all uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/10">
+                {loading ? <Loader2 className="animate-spin w-6 h-6" /> : "Initialize Onboarding"}
               </button>
             </motion.form>
           )}
